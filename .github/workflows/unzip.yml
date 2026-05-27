@@ -1,0 +1,34 @@
+name: Unzip Bot Files
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract ZIP files
+        run: |
+          for file in *.zip; do
+            if [ -f "$file" ]; then
+              unzip -o "$file"
+              rm "$file"
+            fi
+          done
+
+      - name: Commit extracted files
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git add .
+
+          git diff --cached --quiet || git commit -m "Auto extract ZIP files"
+
+          git push
